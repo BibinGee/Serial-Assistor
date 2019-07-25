@@ -23,7 +23,7 @@ class Application(QWidget):
         self.setWindowTitle('FHK Sweep Data Assistor Beta V0.9    Copyright@ Daniel Gee')
 
         self.setGeometry(100,100,1000,500)
-        self.setFixedSize(1000,500)
+        self.setFixedSize(800,500)
         self.setWindowIcon(QIcon(r'./sweep data.ico'))
         self.initGui()
 
