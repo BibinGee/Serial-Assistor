@@ -1,7 +1,8 @@
 # coding = utf-8
-
+# this program is create a simply serial data record assistor for FHK product.
+# as well as collecting LTC sensitivity data while conducting the sweep test.
 # Develop by: Daniel G.
-# Date: 2019-07-02
+# Date: 2019-07-27
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -23,7 +24,7 @@ class Application(QWidget):
         self.setWindowTitle('FHK Sweep Data Assistor Beta V0.9    Copyright@ Daniel Gee')
 
         self.setGeometry(100,100,1000,500)
-        self.setFixedSize(800,500)
+        self.setFixedSize(1000,500)
         self.setWindowIcon(QIcon(r'./sweep data.ico'))
         self.initGui()
 
@@ -244,18 +245,24 @@ class Application(QWidget):
     # Method to Get a file name   
     @pyqtSlot()
     def on_click_save(self):
-        # Get a file hanlder, file formatt '*.csv'
+        # Get a file handler, file format '*.csv'
         try:
             self.file, _ = QFileDialog.getSaveFileName(self, 'Save file', '', 'csv(*.csv)')
             if self.file is not None:
                 self.fnfiled.setText(self.file)
-                
-                with open(self.file, 'a+') as f:
-                    f.write('Time, LTC reading(uA), Serial data')
-                    f.write('\n')
-            print(self.file)
+                if not self.LTC_ser.isOpen:
+                    with open(self.file, 'a+') as f:
+                        f.write('Time, LTC reading(uA), Serial data')
+                        f.write('\n')
+                else:
+                     with open(self.file, 'a+') as f:
+                        f.write('Time, Serial data')
+                        f.write('\n')    
+                self.saveBtn.setEnabled(False)
+#             print(self.file)
         except Exception as e:
             print(e)
+            QMessageBox.warning(self, 'Warning', e)
 
     # Method to set 'flag' TRUE.
     @pyqtSlot()
@@ -276,38 +283,42 @@ class Application(QWidget):
     
     @pyqtSlot()
     def on_click_pause (self):
-        # Reset count down number
-##        self.count = 100.0
-
-        # Clear serial character container
-##        self.characters = []
-        self.filtering_data = []
-        
-        # clear text field
-        self.edit3.setText('')
-
-        # close unit serial port, enable open button
-        if self.ser.isOpen ():
-            self.ser.close()
-            self.unit_ser_open.setEnabled(True)
-            self.edit1.setEnabled(True)
-            self.edit2.setEnabled(True)
+        try:
+            # Clear serial character container
+    ##        self.characters = []
+            self.filtering_data = []
             
-        # close LTC serial port, enable open button   
-        if self.LTC_ser.isOpen ():
-            self.LTC_ser.close()
-            self.ltc_ser_open.setEnabled(True)
-            self.LTC_edit1.setEnabled(True)
-            self.LTC_edit2.setEnabled(True)
-        # disable event loop
-        self.flag = False
-
-        # enalbe start button
-        self.startBtn.setEnabled(True)
-
-        # Clear file path
-        self.file = ''
-        self.fnfiled.setText('')
+            # clear text field
+            self.edit3.setText('')
+    
+            # close unit serial port, enable open button
+            if self.ser.isOpen ():
+                self.ser.close()
+                self.unit_ser_open.setEnabled(True)
+                self.edit1.setEnabled(True)
+                self.edit2.setEnabled(True)
+                
+            # close LTC serial port, enable open button   
+            if self.LTC_ser.isOpen ():
+                self.LTC_ser.close()
+                self.ltc_ser_open.setEnabled(True)
+                self.LTC_edit1.setEnabled(True)
+                self.LTC_edit2.setEnabled(True)
+            # disable event loop
+            self.flag = False
+    
+            # enable start button
+            self.startBtn.setEnabled(True)
+            
+            # enable save button
+            self.saveBtn.setEnabled(True)
+    
+            # Clear file path
+            self.file = ''
+            self.fnfiled.setText('')
+        except Exception as e:
+            print(e)
+            QMessageBox.warning(self, 'Warning', e)
 
 
 
@@ -403,6 +414,7 @@ class Application(QWidget):
                                 self.edit3.setText('Saving:'+ text)
                 except Exception as e:
                     print(e)
+                    QMessageBox.warning(self, 'Warning', e)
 
                 # take care to clean self.line each time before loop ends.
                 self.line = ''                        
