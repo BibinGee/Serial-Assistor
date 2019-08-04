@@ -243,7 +243,7 @@ class Application(QWidget):
             print('Cannot open LTC Serial Port!!!')
                 
     # Method to Get a file name   
-    @pyqtSlot()
+    #@pyqtSlot()
     def on_click_save(self):
         # Get a file handler, file format '*.csv'
         try:
@@ -265,7 +265,7 @@ class Application(QWidget):
             QMessageBox.warning(self, 'Warning', e)
 
     # Method to set 'flag' TRUE.
-    @pyqtSlot()
+   # @pyqtSlot()
     def on_click_start(self):
         self.startBtn.setEnabled(False)
         self.saveBtn.setEnabled(True)
@@ -281,7 +281,7 @@ class Application(QWidget):
     # Method to Stop Unit Serial Port, LTC Serial Port update
     # 
     
-    @pyqtSlot()
+   # @pyqtSlot()
     def on_click_pause (self):
         try:
             # Clear serial character container
@@ -324,7 +324,7 @@ class Application(QWidget):
 
     # Send command to Unit through Unit Serial Port                
    
-    @pyqtSlot()
+    #@pyqtSlot()
     def on_click_cmd (self):
         if self.ser.isOpen ():
             cmd = self.edit4.text() + '\r'
