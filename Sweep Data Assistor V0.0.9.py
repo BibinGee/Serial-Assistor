@@ -23,8 +23,8 @@ class Application(QWidget):
         super().__init__()
         self.setWindowTitle('FHK Sweep Data Assistor Beta V0.9    Copyright@ Daniel Gee')
 
-        self.setGeometry(100,100,1000,500)
-        self.setFixedSize(1000,500)
+#         self.setGeometry(100,100,850,500)
+##        self.setFixedSize(820,500)
         self.setWindowIcon(QIcon(r'./sweep data.ico'))
         self.initGui()
 
@@ -38,18 +38,23 @@ class Application(QWidget):
         h1 = QHBoxLayout()
         self.label1 = QLabel(self)
         self.label1.setText('Unit Serial')
+        self.label1.setFont(QFont("Microsoft YaHei"))
         h1.addWidget(self.label1)                    
         self.edit1 = QLineEdit(self)
+        self.edit1.setFont(QFont("Microsoft YaHei"))
         h1.addWidget(self.edit1)
 
         self.label2 = QLabel(self)
         self.label2.setText('Baudrate')
+        self.label2.setFont(QFont("Microsoft YaHei"))
         h1.addWidget(self.label2)                    
         self.edit2 = QLineEdit(self)
         self.edit2.setText('19200')
+        self.edit2.setFont(QFont("Microsoft YaHei"))
         h1.addWidget(self.edit2)
 
         self.unit_ser_open = QPushButton('Open', self)
+        self.unit_ser_open.setFont(QFont("Microsoft YaHei"))
         self.unit_ser_open.clicked.connect(self.on_click_unit_ser_open)
         h1.addWidget(self.unit_ser_open)
         
@@ -59,19 +64,24 @@ class Application(QWidget):
         h2 = QHBoxLayout()
         self.LTC_label1 = QLabel(self)
         self.LTC_label1.setText('LTC Serial')
+        self.LTC_label1.setFont(QFont("Microsoft YaHei"))
         h2.addWidget(self.LTC_label1)                    
         self.LTC_edit1 = QLineEdit(self)
+        self.LTC_edit1.setFont(QFont("Microsoft YaHei"))
         h2.addWidget(self.LTC_edit1)
 
         self.LTC_label2 = QLabel(self)
         self.LTC_label2.setText('Baudrate')
+        self.LTC_label2.setFont(QFont("Microsoft YaHei"))
         h2.addWidget(self.LTC_label2)                    
         self.LTC_edit2 = QLineEdit(self)
         self.LTC_edit2.setText('19200')
+        self.LTC_edit2.setFont(QFont("Microsoft YaHei"))
         self.LTC_edit2.setEnabled(False)
         h2.addWidget(self.LTC_edit2)
 
         self.ltc_ser_open = QPushButton('Open', self)
+        self.ltc_ser_open.setFont(QFont("Microsoft YaHei"))
         self.ltc_ser_open.clicked.connect(self.on_click_ltc_ser_open)
         h2.addWidget(self.ltc_ser_open)
                 
@@ -80,6 +90,7 @@ class Application(QWidget):
         # h3 Horizontal Box to include Step, Command components
         h3 = QHBoxLayout()
         self.label5 = QLabel(self)
+        self.label5.setFont(QFont("Microsoft YaHei"))
         self.label5.setText('LTC Compensation (uA)')
         h3.addWidget(self.label5)
         
@@ -90,6 +101,7 @@ class Application(QWidget):
         self.edit4 = QLineEdit(self)
         h3.addWidget(self.edit4)                 
         self.comBtn = QPushButton('Send command', self)
+        self.comBtn.setFont(QFont("Microsoft YaHei"))
         self.comBtn.clicked.connect(self.on_click_cmd)
         h3.addWidget(self.comBtn)
         sub_v_layout.addLayout(h3)
@@ -97,19 +109,24 @@ class Application(QWidget):
         # h4 Horizontal Box to include Buttons components
         h4 = QHBoxLayout()
         self.saveBtn = QPushButton('Save', self)
+        self.saveBtn.setFont(QFont("Microsoft YaHei"))
         self.saveBtn.clicked.connect(self.on_click_save)
         self.saveBtn.setEnabled(False)
         h4.addWidget(self.saveBtn)
 
         self.startBtn = QPushButton('Start', self)
+        self.startBtn.setFont(QFont("Microsoft YaHei"))
         self.startBtn.clicked.connect(self.on_click_start)
         h4.addWidget(self.startBtn)
 
         self.pauseBtn = QPushButton('Pause', self)
+        self.pauseBtn.setFont(QFont("Microsoft YaHei"))
+        self.pauseBtn.setEnabled(False)
         self.pauseBtn.clicked.connect(self.on_click_pause)
         h4.addWidget(self.pauseBtn)
 
         self.graphBtn = QPushButton('Graph', self)
+        self.graphBtn.setFont(QFont("Microsoft YaHei"))
         self.graphBtn.clicked.connect(self.on_click_graph)
         h4.addWidget(self.graphBtn)
         
@@ -135,13 +152,15 @@ class Application(QWidget):
         # Text display field 
         self.tedit = QTextEdit()
         f = self.tedit.font()
-        f.setPointSize(11)
+        f.setPointSize(9)
+        f.setFamily('Microsoft YaHei')
         self.tedit.setFont(f)
         layout.addWidget(self.tedit)
 
         self.edit3 = QLineEdit(self)
         f = self.edit3.font()
-        f.setPointSize(10)
+        f.setPointSize(8)
+        f.setFamily('Microsoft YaHei')
         self.edit3.setFont(f)
         self.edit3.setStyleSheet("color: green;")
         self.edit3.setText('......')
@@ -210,6 +229,7 @@ class Application(QWidget):
                 self.edit2.setEnabled(True)
         else:
             print('Cannot open Unit Serial Port!!!')
+            QMessageBox.warning(self, 'warning', 'Cannot open Unit Serial Port!!! Check Serial port if available')
     
                 
      # Method to Open LTC Serial Port           
@@ -241,6 +261,7 @@ class Application(QWidget):
                 self.LTC_edit2.setEnabled(True)
         else:
             print('Cannot open LTC Serial Port!!!')
+            QMessageBox.warning(self, 'warning', 'Cannot open LTC Serial Port!!! Check Serial port if available')
                 
     # Method to Get a file name   
     #@pyqtSlot()
@@ -267,15 +288,18 @@ class Application(QWidget):
     # Method to set 'flag' TRUE.
    # @pyqtSlot()
     def on_click_start(self):
-        self.startBtn.setEnabled(False)
-        self.saveBtn.setEnabled(True)
         try:
             if not self.ser.is_open:
                 self.on_click_unit_ser_open()
             if not self.LTC_ser.isOpen:
                 self.on_click_ltc_ser_open()
+                
+            self.startBtn.setEnabled(False)
+            self.saveBtn.setEnabled(True)
+            self.pauseBtn.setEnabled(True)
         except Exception as e:
             print(e)
+            QMessageBox.warning(self, 'warning', e)
         self.flag = True
 
     # Method to Stop Unit Serial Port, LTC Serial Port update
@@ -312,6 +336,8 @@ class Application(QWidget):
             
             # enable save button
             self.saveBtn.setEnabled(True)
+            
+            self.pauseBtn.setEnabled(False)
     
             # Clear file path
             self.file = ''
