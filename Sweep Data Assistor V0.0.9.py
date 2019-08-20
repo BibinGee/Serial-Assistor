@@ -16,7 +16,6 @@ import numpy as np
 import kalmanfilter
 
 from Graph import Graph
-from warnings import catch_warnings
 
 class Application(QWidget):
     def __init__(self):
@@ -171,7 +170,9 @@ class Application(QWidget):
 
         # Global serial handler
         self.ser = serial.Serial ()
+
         self.LTC_ser = serial.Serial()
+
         self.file = ''
 
         # Define timer to loop events
@@ -204,12 +205,12 @@ class Application(QWidget):
     def on_click_unit_ser_open(self):
         # Get baudrate
         if self.edit2.text() is not '':
-            print(self.edit2.text())
+#             print(self.edit2.text())
             self.ser.baudrate = self.edit2.text()
             
         # Get serial port
         if self.edit1.text() is not '':
-            print(self.edit1.text())
+#             print(self.edit1.text())
             self.ser.port  = self.edit1.text()
 
         if self.ser.baudrate and self.ser.port is not None:
@@ -221,27 +222,30 @@ class Application(QWidget):
                 self.ser.open()
                 print('Unit Serial Port:', self.ser.port, 'opened')
                 
+                
             except serial.serialutil.SerialException as e:
                 print(e)
+                QMessageBox.warning(self, 'Warning' , str(e))
                 self.ser.close()
+                self.startBtn.setEnabled(True)
                 self.unit_ser_open.setEnabled(True)
                 self.edit1.setEnabled(True)
                 self.edit2.setEnabled(True)
         else:
             print('Cannot open Unit Serial Port!!!')
-            QMessageBox.warning(self, 'warning', 'Cannot open Unit Serial Port!!! Check Serial port if available')
+            QMessageBox.warning(self, 'Warning', 'Cannot open Unit Serial Port!!! Check Serial port if available')
     
                 
      # Method to Open LTC Serial Port           
     def on_click_ltc_ser_open(self):
         # Get baudrate
         if self.LTC_edit2.text() is not '':
-            print(self.LTC_edit2.text())
+#             print(self.LTC_edit2.text())
             self.LTC_ser.baudrate = self.LTC_edit2.text()
             
         # Get serial port
         if self.LTC_edit1.text() is not '':
-            print(self.LTC_edit1.text())
+#             print(self.LTC_edit1.text())
             self.LTC_ser.port  = self.LTC_edit1.text()
 
         if self.LTC_ser.baudrate and self.LTC_ser.port is not None:
@@ -255,13 +259,14 @@ class Application(QWidget):
  
             except serial.serialutil.SerialException as e:
                 print(e)
+                QMessageBox.warning(self, 'Warning' , str(e))
                 self.ltc_ser_open.setEnabled(True)
                 self.LTC_ser.close()
                 self.LTC_edit1.setEnabled(True)
                 self.LTC_edit2.setEnabled(True)
         else:
             print('Cannot open LTC Serial Port!!!')
-            QMessageBox.warning(self, 'warning', 'Cannot open LTC Serial Port!!! Check Serial port if available')
+            QMessageBox.warning(self, 'Warning', 'Cannot open LTC Serial Port!!! Check Serial port if available')
                 
     # Method to Get a file name   
     #@pyqtSlot()
@@ -283,23 +288,27 @@ class Application(QWidget):
 #             print(self.file)
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, 'Warning', e)
+            QMessageBox.warning(self, 'Warning', str(e))
 
     # Method to set 'flag' TRUE.
    # @pyqtSlot()
     def on_click_start(self):
         try:
-            if not self.ser.is_open:
+            self.startBtn.setEnabled(False)
+            
+            print('Unit serial port:', self.ser.isOpen())
+            if not self.ser.isOpen ():
                 self.on_click_unit_ser_open()
-            if not self.LTC_ser.isOpen:
+                
+            print('LTC serial port:', self.LTC_ser.isOpen())
+            if not self.LTC_ser.isOpen ():
                 self.on_click_ltc_ser_open()
                 
-            self.startBtn.setEnabled(False)
             self.saveBtn.setEnabled(True)
             self.pauseBtn.setEnabled(True)
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, 'warning', e)
+            QMessageBox.warning(self, 'Warning', str(e))
         self.flag = True
 
     # Method to Stop Unit Serial Port, LTC Serial Port update
@@ -344,7 +353,7 @@ class Application(QWidget):
             self.fnfiled.setText('')
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, 'Warning', e)
+            QMessageBox.warning(self, 'Warning', str(e))
 
 
 
@@ -389,6 +398,8 @@ class Application(QWidget):
 #                         print(self.line)
             except Exception as e:
                     print(e)
+                    QMessageBox.warning(self, 'Warning', str(e))
+                    self.on_click_pause()
                     
             # Read ADC data from Arduino Board.        
             if self.LTC_ser.isOpen():
@@ -428,11 +439,15 @@ class Application(QWidget):
                         self.LTC_label.setText(str('%2.2f'%median))
                         
                         self.graph.updateStream(self.line, ltc_data = median)
-
+                        
                         # Write data to CSV file and save it.
                         if self.line != '':
                             t = time.strftime ('[%H:%M:%S],', time.localtime ())
                             text = self.line.replace('>', t + ',' + str('%2.2f'%median) + ',' )
+                            
+                            # below line just to ignore some mess up characters.
+                            text = text.encode("gbk", 'ignore').decode("gbk", "ignore")
+                            
                             if(self.file != ''):
                                 with open(self.file, 'a+') as f:
                                         f.write(text)
@@ -440,7 +455,7 @@ class Application(QWidget):
                                 self.edit3.setText('Saving:'+ text)
                 except Exception as e:
                     print(e)
-                    QMessageBox.warning(self, 'Warning', e)
+                    QMessageBox.warning(self, 'Warning', str(e))
 
                 # take care to clean self.line each time before loop ends.
                 self.line = ''                        
@@ -450,11 +465,19 @@ class Application(QWidget):
                 if self.line != '':
                     t = time.strftime ('[%H:%M:%S],>', time.localtime ())
                     text = self.line.replace('>', t )
-                    if(self.file != ''):
-                        with open(self.file, 'a+') as f:
-                                f.write(text)
-                                f.write('\n')
-                        self.edit3.setText('Saving:'+ text)                
+                    
+                    # below line just to ignore some mess up characters.
+                    text = text.encode("gbk", 'ignore').decode("gbk", "ignore")
+                    
+                    try:
+                        if(self.file != ''):
+                            with open(self.file, 'a+') as f:
+                                    f.write(text)
+                                    f.write('\n')
+                            self.edit3.setText('Saving:'+ text) 
+                    except Exception as e:
+                        print('error:', e) 
+                        QMessageBox.warning(self, 'Warning', str(e))              
                 # take care to clean self.line each time before loop ends.
                 self.line = ''
 
