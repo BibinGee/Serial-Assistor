@@ -2,7 +2,7 @@
 # this program is create a simply serial data record assistor for FHK product.
 # as well as collecting LTC sensitivity data while conducting the sweep test.
 # Develop by: Daniel G.
-# Date: 2019-07-27
+# Date: 2019-08-21
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
